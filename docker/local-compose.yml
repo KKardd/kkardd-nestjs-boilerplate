@@ -1,0 +1,60 @@
+services:
+  bp_api:
+    container_name: api
+    build:
+      context: .
+      dockerfile: local-dockerfile
+    volumes:
+      - ./src:/api/src
+    restart: always
+    ports:
+      - ${SERVER_PORT}:${SERVER_PORT}
+    depends_on:
+      bp_db:
+        condition: service_healthy
+      redis-server:
+        condition: service_healthy
+    networks:
+      - local-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2048M
+
+  bp_db:
+    image: postgis/postgis:15-3.4
+    restart: always
+    container_name: db
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+      TZ: Asia/Seoul
+    healthcheck:
+      test: ['CMD', 'pg_isready', '-U', 'postgres']
+      timeout: 20s
+      retries: 10
+    ports:
+      - ${DATABASE_PORT}:${DATABASE_PORT}
+    networks:
+      - local-network
+
+  redis-server:
+    image: redis
+    container_name: redis-server
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    ports:
+      - '6379:6379'
+    networks:
+      - local-network
+volumes:
+  db:
+
+networks:
+  local-network:
+    driver: bridge
