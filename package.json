@@ -22,7 +22,8 @@
     "docker:build": "docker-compose -f docker/local-compose.yml --env-file src/global/config/envs/.local.env build",
     "docker:down": "docker-compose -f docker/local-compose.yml --env-file src/global/config/envs/.local.env down",
     "docker:exec": "docker exec -it api /bin/sh",
-    "generate:prsima": "npx prisma generate --schema=./prisma/schema.prisma"
+    "generate:prsima": "npx prisma generate --schema=./src/prisma/schema.prisma",
+    "migrate:prisma": "dotenv -e ./src/global/config/envs/.local.env -- npx prisma migrate dev --name init"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.637.0",
@@ -48,6 +49,7 @@
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
+    "dotenv-cli": "^7.4.2",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
